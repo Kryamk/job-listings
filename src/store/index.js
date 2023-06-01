@@ -1,9 +1,21 @@
-import { createStore } from "redux";
+import { applyMiddleware,  compose,  createStore } from "redux";
 import { rootReducer } from "./root-reducer";
+import logger from "redux-logger";
 
+const customLogger = (store) => (next) => (action) => {
+	console.group(1, action.type)
+	console.log(action)
+	console.log('current state', store.getState())
+	next(action)
+	console.log('next state', store.getState())
+	console.groupEnd();
+}
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-export const store = createStore(
+const store = createStore(
 	rootReducer,
-	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+	// window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+	composeEnhancers(applyMiddleware(logger, customLogger))
 )
+export { store }
